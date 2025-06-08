@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feline Genetics Predictor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chosen Palette: Warm Neutrals -->
+    <!-- Application Structure Plan: The application uses a task-oriented "predictor" layout. The primary user flow involves selecting Sire (male) and Dam (female) traits from dropdowns, which dynamically update based on genetic rules. A main button triggers the prediction, displaying results clearly separated by gender. This structure was chosen because it directly mirrors the user's primary goal: to get a quick, accurate prediction for a specific pairing. A secondary, toggle-able "Genetics Guide" section is included to provide context and educational value without cluttering the main interface, making the tool self-contained and user-friendly for both novice and expert users. -->
+    <!-- Visualization & Content Choices: The core information from the newpredictor.js script is presented as an interactive form. Goal: Predict. Method: Dropdown selectors for parent traits and dynamically generated HTML lists for offspring results. Interaction: Real-time updates to dropdown options based on selections and a button to trigger the prediction. Justification: This is the most intuitive UI for a calculator-style tool. The static educational content (lexicon, rules) is presented in a readable, structured HTML format within a collapsible section, allowing users to access detailed information on demand without distracting from the main prediction task. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
+        .control-panel {
+            background-color: #FDFBF6;
+            border: 1px solid #EFEBE4;
+        }
+        .results-card {
+            background-color: #FFFFFF;
+            border: 1px solid #EFEBE4;
+        }
+        .btn-predict {
+            background-color: #8B4513; /* SaddleBrown */
+            color: #FFFFFF;
+            transition: background-color 0.3s;
+        }
+        .btn-predict:hover {
+            background-color: #A0522D; /* Sienna */
+        }
+        .btn-guide {
+            background-color: #FDFBF6;
+            border: 1px solid #8B4513;
+            color: #8B4513;
+            transition: all 0.3s;
+        }
+        .btn-guide:hover {
+            background-color: #8B4513;
+            color: #FFFFFF;
+        }
+        select:disabled {
+            background-color: #F3F4F6;
+            cursor: not-allowed;
+        }
+        #geneticsGuide dl dt {
+            font-weight: 700;
+            color: #8B4513;
+            margin-top: 1rem;
+        }
+        #geneticsGuide dl dd {
+            margin-left: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .kitten-list li {
+            background-color: #FDFBF6;
+            border-left: 3px solid #A0522D;
+        }
+    </style>
+</head>
+<body class="bg-stone-100 text-stone-800">
+
+    <div class="container mx-auto p-4 md:p-8 max-w-5xl">
+        <header class="text-center mb-8">
+            <h1 class="text-4xl md:text-5xl font-bold text-amber-900">Feline Genetics Predictor</h1>
+            <p class="text-stone-600 mt-2 text-lg">An interactive tool to predict kitten colors and patterns.</p>
+        </header>
+
+        <main>
+            <div class="control-panel p-6 rounded-lg shadow-lg mb-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Sire (Male) Panel -->
+                    <div>
+                        <h2 class="text-2xl font-bold text-amber-800 border-b-2 border-amber-800 pb-2 mb-4">Sire (Male)</h2>
+                        <div class="space-y-4">
+                            <div>
+                                <label for="maleColour" class="block text-sm font-medium text-stone-700">Colour</label>
+                                <select id="maleColour" class="mt-1 block w-full py-2 px-3 border border-stone-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-amber-500 focus:border-amber-500"></select>
+                            </div>
+                            <div>
+                                <label for="maleDilute" class="block text-sm font-medium text-stone-700">Dilute Gene</label>
+                                <select id="maleDilute" class="mt-1 block w-full py-2 px-3 border border-stone-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-amber-500 focus:border-amber-500"></select>
+                            </div>
+                            <div>
+                                <label for="maleBrown" class="block text-sm font-medium text-stone-700">Brown (Chocolate) Gene</label>
+                                <select id="maleBrown" class="mt-1 block w-full py-2 px-3 border border-stone-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-amber-500 focus:border-amber-500"></select>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Dam (Female) Panel -->
+                    <div>
+                        <h2 class="text-2xl font-bold text-amber-800 border-b-2 border-amber-800 pb-2 mb-4">Dam (Female)</h2>
+                        <div class="space-y-4">
+                            <div>
+                                <label for="femaleColour" class="block text-sm font-medium text-stone-700">Colour</label>
+                                <select id="femaleColour" class="mt-1 block w-full py-2 px-3 border border-stone-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-amber-500 focus:border-amber-500"></select>
+                            </div>
+                            <div>
+                                <label for="femaleDilute" class="block text-sm font-medium text-stone-700">Dilute Gene</label>
+                                <select id="femaleDilute" class="mt-1 block w-full py-2 px-3 border border-stone-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-amber-500 focus:border-amber-500"></select>
+                            </div>
+                            <div>
+                                <label for="femaleBrown" class="block text-sm font-medium text-stone-700">Brown (Chocolate) Gene</label>
+                                <select id="femaleBrown" class="mt-1 block w-full py-2 px-3 border border-stone-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-amber-500 focus:border-amber-500"></select>
+                            </div>
+                            <div class="flex items-center pt-2">
+                                <input id="femaleTortie" type="checkbox" class="h-4 w-4 text-amber-600 focus:ring-amber-500 border-stone-300 rounded">
+                                <label for="femaleTortie" id="tortieLabel" class="ml-2 block text-sm font-medium text-stone-700">Tortoiseshell</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-8 text-center">
+                    <button id="predictBtn" class="btn-predict font-bold py-3 px-8 rounded-lg shadow-md text-xl">Predict Kittens</button>
+                </div>
+            </div>
+
+            <div id="resultsContainer" class="hidden">
+                <h2 class="text-3xl font-bold text-center text-amber-900 mb-6">Predicted Offspring</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="results-card rounded-lg shadow-lg p-6">
+                        <h3 class="text-2xl font-bold text-amber-800 mb-4 text-center">Male Kittens</h3>
+                        <ul id="maleResults" class="space-y-2 kitten-list"></ul>
+                    </div>
+                    <div class="results-card rounded-lg shadow-lg p-6">
+                        <h3 class="text-2xl font-bold text-amber-800 mb-4 text-center">Female Kittens</h3>
+                        <ul id="femaleResults" class="space-y-2 kitten-list"></ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center mt-12">
+                <button id="toggleGuideBtn" class="btn-guide font-bold py-2 px-6 rounded-lg">Show Genetics Guide</button>
+            </div>
+
+            <div id="geneticsGuide" class="hidden mt-8 control-panel p-6 rounded-lg shadow-lg">
+                <h2 class="text-3xl font-bold text-amber-900 mb-4">Feline Genetics Guide</h2>
+                <p class="mb-6 text-stone-600">This guide explains the core genetic principles used by the predictor to determine potential offspring colors and patterns. Understanding these concepts will help you interpret the results more effectively.</p>
+                
+                <h3 class="text-xl font-bold text-amber-800 border-b border-amber-800 pb-1 mb-2">Core Genetic Concepts</h3>
+                <dl>
+                    <dt>Orange Gene (Sex-Linked Red)</dt>
+                    <dd>Located on the X-chromosome, this gene determines if a cat will be red-based or black-based. It is 'epistatic', meaning it masks the black/brown gene. A male (XY) gets one copy, while a female (XX) gets two.</dd>
+                    
+                    <dt>Brown Gene (Black vs. Chocolate)</dt>
+                    <dd>This gene modifies the base black pigment. The allele for black (`B`) is dominant over the allele for chocolate (`b`). A cat must have two copies of the chocolate allele (`bb`) to be chocolate-colored.</dd>
+
+                    <dt>Dilute Gene (Dense vs. Dilute)</dt>
+                    <dd>This gene affects the intensity of a color. The allele for dense color (`D`) is dominant over the allele for dilute (`d`). A cat must have two copies of the dilute allele (`dd`) for its coat to be diluted (e.g., Seal becomes Blue, Red becomes Cream).</dd>
+                </dl>
+                
+                <h3 class="text-xl font-bold text-amber-800 border-b border-amber-800 pb-1 mt-6 mb-2">Genotype to Phenotype Key</h3>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full bg-white rounded-lg mt-2">
+                        <thead class="bg-amber-800 text-white">
+                            <tr>
+                                <th class="py-2 px-4 text-left">Phenotype (Color)</th>
+                                <th class="py-2 px-4 text-left">Required Genes</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-stone-200">
+                            <tr><td class="py-2 px-4">Seal</td><td class="py-2 px-4">Non-Orange, Black-based, Dense</td></tr>
+                            <tr class="bg-stone-50"><td class="py-2 px-4">Blue</td><td class="py-2 px-4">Non-Orange, Black-based, Dilute</td></tr>
+                            <tr><td class="py-2 px-4">Chocolate</td><td class="py-2 px-4">Non-Orange, Chocolate-based, Dense</td></tr>
+                            <tr class="bg-stone-50"><td class="py-2 px-4">Lilac</td><td class="py-2 px-4">Non-Orange, Chocolate-based, Dilute</td></tr>
+                            <tr><td class="py-2 px-4">Red</td><td class="py-2 px-4">Orange, Dense</td></tr>
+                            <tr class="bg-stone-50"><td class="py-2 px-4">Cream</td><td class="py-2 px-4">Orange, Dilute</td></tr>
+                            <tr><td class="py-2 px-4">Tortoiseshell</td><td class="py-2 px-4">Female only, with one Orange and one Non-Orange gene (XOXo)</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+        
+        <footer class="text-center text-sm text-stone-500 mt-12 py-4 border-t border-stone-200">
+            <p>Genetics based on the logic from the `newpredictor.js` script.</p>
+            <p>&copy; 2025 Feline Genetics Predictor. All Rights Reserved.</p>
+        </footer>
+    </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    const GENE = {
+        GENDER: { O: 'O', X: 'X', Y: 'Y' },
+        DILUTE: { D: 'D', d: 'd' },
+        BROWN: { B: 'B', b: 'b' }
+    };
+    
+    const GENE_EXPR = { None: 0, Homo: 1, Hetero: 2 };
+
+    const CARRYING = {
+        NotApplicable: { val: 'NotApplicable', text: 'Not Applicable' },
+        Unknown: { val: 'Unknown', text: 'Don\'t Know' },
+        NotCarrying: { val: 'NotCarrying', text: 'Not Carrying' },
+        Carrying: { val: 'Carrying', text: 'Carrying' },
+        Homozygous: { val: 'Homozygous', text: 'Homozygous' }
+    };
+
+    const COLOURS = {
+        Red: {
+            text: 'Red',
+            diluteOptions: [CARRYING.NotCarrying, CARRYING.Carrying],
+            brownOptions: [CARRYING.NotCarrying, CARRYING.Carrying, CARRYING.Homozygous]
+        },
+        Cream: {
+            text: 'Cream',
+            diluteOptions: [],
+            brownOptions: [CARRYING.NotCarrying, CARRYING.Carrying, CARRYING.Homozygous]
+        },
+        Seal: {
+            text: 'Seal',
+            diluteOptions: [CARRYING.NotCarrying, CARRYING.Carrying],
+            brownOptions: [CARRYING.NotCarrying, CARRYING.Carrying]
+        },
+        Chocolate: {
+            text: 'Chocolate',
+            diluteOptions: [CARRYING.NotCarrying, CARRYING.Carrying],
+            brownOptions: []
+        },
+        Blue: {
+            text: 'Blue',
+            diluteOptions: [],
+            brownOptions: [CARRYING.NotCarrying, CARRYING.Carrying]
+        },
+        Lilac: {
+            text: 'Lilac',
+            diluteOptions: [],
+            brownOptions: []
+        }
+    };
+    
+    class GenePair {
+        constructor(one, two) {
+            this.one = one;
+            this.two = two;
+        }
+    }
+
+    class Cat {
+        constructor() {
+            this.gender = null;
+            this.dilute = null;
+            this.brown = null;
+        }
+
+        setMale(colourKey, diluteCarry, brownCarry) {
+            this.gender = (colourKey === 'Red' || colourKey === 'Cream') ? new GenePair(GENE.GENDER.Y, GENE.GENDER.O) : new GenePair(GENE.GENDER.Y, GENE.GENDER.X);
+            this.setDiluteAndBrown(colourKey, diluteCarry, brownCarry);
+        }
+
+        setFemale(colourKey, isTortie, diluteCarry, brownCarry) {
+            if (colourKey === 'Red' || colourKey === 'Cream') {
+                this.gender = new GenePair(GENE.GENDER.O, GENE.GENDER.O);
+            } else {
+                this.gender = isTortie ? new GenePair(GENE.GENDER.X, GENE.GENDER.O) : new GenePair(GENE.GENDER.X, GENE.GENDER.X);
+            }
+            this.setDiluteAndBrown(colourKey, diluteCarry, brownCarry);
+        }
+
+        setDiluteAndBrown(colourKey, diluteCarry, brownCarry) {
+            let diluteSet = false;
+            let brownSet = false;
+
+            if (colourKey === 'Cream' || colourKey === 'Blue' || colourKey === 'Lilac') {
+                this.dilute = new GenePair(GENE.DILUTE.d, GENE.DILUTE.d);
+                diluteSet = true;
+            }
+            if (colourKey === 'Chocolate' || colourKey === 'Lilac') {
+                this.brown = new GenePair(GENE.BROWN.b, GENE.BROWN.b);
+                brownSet = true;
+            }
+            
+            if (!diluteSet) {
+                if (diluteCarry === 'NotCarrying') this.dilute = new GenePair(GENE.DILUTE.D, GENE.DILUTE.D);
+                else if (diluteCarry === 'Carrying') this.dilute = new GenePair(GENE.DILUTE.D, GENE.DILUTE.d);
+                else this.dilute = new GenePair(GENE.DILUTE.D, GENE.DILUTE.D); // Default
+            }
+
+            if (!brownSet) {
+                 if (brownCarry === 'NotCarrying') this.brown = new GenePair(GENE.BROWN.B, GENE.BROWN.B);
+                 else if (brownCarry === 'Carrying') this.brown = new GenePair(GENE.BROWN.B, GENE.BROWN.b);
+                 else if (brownCarry === 'Homozygous') this.brown = new GenePair(GENE.BROWN.b, GENE.BROWN.b);
+                 else this.brown = new GenePair(GENE.BROWN.B, GENE.BROWN.B); // Default
+            }
+        }
+        
+        getDescription() {
+            const getColour = () => {
+                const diluteExpr = this.getDiluteExpr();
+                const brownExpr = this.getBrownExpr();
+
+                if ((this.gender.one === GENE.GENDER.O && this.gender.two === GENE.GENDER.O) || this.gender.one === GENE.GENDER.Y && this.gender.two === GENE.GENDER.O) {
+                     return diluteExpr === GENE_EXPR.Homo ? 'Cream' : 'Red';
+                }
+                if (diluteExpr === GENE_EXPR.Homo) {
+                    return brownExpr === GENE_EXPR.Homo ? 'Lilac' : 'Blue';
+                }
+                return brownExpr === GENE_EXPR.Homo ? 'Chocolate' : 'Seal';
+            };
+
+            const colour = getColour();
+            let desc = colour;
+            
+            if (this.gender.one === GENE.GENDER.X && this.gender.two === GENE.GENDER.O) {
+                desc += " Tortie";
+            }
+            
+            const diluteExpr = this.getDiluteExpr();
+            const brownExpr = this.getBrownExpr();
+            const carrying = [];
+
+            if (colour !== 'Blue' && colour !== 'Cream' && colour !== 'Lilac' && diluteExpr === GENE_EXPR.Hetero) {
+                carrying.push("dilute");
+            }
+            if (colour !== 'Chocolate' && colour !== 'Lilac' && brownExpr === GENE_EXPR.Hetero) {
+                carrying.push("chocolate");
+            }
+            
+            if(carrying.length > 0) {
+                desc += ` (carries ${carrying.join(' & ')})`;
+            }
+
+            if ((colour === 'Red' || colour === 'Cream') && brownExpr === GENE_EXPR.Homo) {
+                desc += " (homozygous for chocolate)";
+            }
+
+            return desc;
+        }
+
+        getDiluteExpr() {
+            if (this.dilute.one === GENE.DILUTE.D && this.dilute.two === GENE.DILUTE.D) return GENE_EXPR.None;
+            if (this.dilute.one === GENE.DILUTE.d && this.dilute.two === GENE.DILUTE.d) return GENE_EXPR.Homo;
+            return GENE_EXPR.Hetero;
+        }
+
+        getBrownExpr() {
+            if (this.brown.one === GENE.BROWN.B && this.brown.two === GENE.BROWN.B) return GENE_EXPR.None;
+            if (this.brown.one === GENE.BROWN.b && this.brown.two === GENE.BROWN.b) return GENE_EXPR.Homo;
+            return GENE_EXPR.Hetero;
+        }
+    }
+
+    function getCombinations(pair1, pair2) {
+        return [
+            new GenePair(pair1.one, pair2.one),
+            new GenePair(pair1.one, pair2.two),
+            new GenePair(pair1.two, pair2.one),
+            new GenePair(pair1.two, pair2.two)
+        ];
+    }
+    
+    function predictKittens(maleCat, femaleCat) {
+        const maleKittens = [];
+        const femaleKittens = [];
+
+        const genderCombos = getCombinations(maleCat.gender, femaleCat.gender);
+        const diluteCombos = getCombinations(maleCat.dilute, femaleCat.dilute);
+        const brownCombos = getCombinations(maleCat.brown, femaleCat.brown);
+        
+        for (const gender of genderCombos) {
+            for (const dilute of diluteCombos) {
+                for (const brown of brownCombos) {
+                    const kitten = new Cat();
+                    kitten.gender = gender;
+                    kitten.dilute = dilute;
+                    kitten.brown = brown;
+                    
+                    if (kitten.gender.one === GENE.GENDER.Y) {
+                         maleKittens.push(kitten.getDescription());
+                    } else {
+                         femaleKittens.push(kitten.getDescription());
+                    }
+                }
+            }
+        }
+
+        return {
+            males: [...new Set(maleKittens)].sort(),
+            females: [...new Set(femaleKittens)].sort()
+        };
+    }
+    
+    function populateSelect(element, options, defaultValue) {
+        element.innerHTML = '';
+        options.for
