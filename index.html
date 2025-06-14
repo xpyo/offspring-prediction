@@ -1,388 +1,772 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Feline Genetics Predictor</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Chosen Palette: Warm Neutrals -->
-    <!-- Application Structure Plan: The application uses a task-oriented "predictor" layout. The primary user flow involves selecting Sire (male) and Dam (female) traits from dropdowns, which dynamically update based on genetic rules. A main button triggers the prediction, displaying results clearly separated by gender. This structure was chosen because it directly mirrors the user's primary goal: to get a quick, accurate prediction for a specific pairing. A secondary, toggle-able "Genetics Guide" section is included to provide context and educational value without cluttering the main interface, making the tool self-contained and user-friendly for both novice and expert users. -->
-    <!-- Visualization & Content Choices: The core information from the newpredictor.js script is presented as an interactive form. Goal: Predict. Method: Dropdown selectors for parent traits and dynamically generated HTML lists for offspring results. Interaction: Real-time updates to dropdown options based on selections and a button to trigger the prediction. Justification: This is the most intuitive UI for a calculator-style tool. The static educational content (lexicon, rules) is presented in a readable, structured HTML format within a collapsible section, allowing users to access detailed information on demand without distracting from the main prediction task. -->
-    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
-        .control-panel {
-            background-color: #FDFBF6;
-            border: 1px solid #EFEBE4;
-        }
-        .results-card {
-            background-color: #FFFFFF;
-            border: 1px solid #EFEBE4;
-        }
-        .btn-predict {
-            background-color: #8B4513; /* SaddleBrown */
-            color: #FFFFFF;
-            transition: background-color 0.3s;
-        }
-        .btn-predict:hover {
-            background-color: #A0522D; /* Sienna */
-        }
-        .btn-guide {
-            background-color: #FDFBF6;
-            border: 1px solid #8B4513;
-            color: #8B4513;
-            transition: all 0.3s;
-        }
-        .btn-guide:hover {
-            background-color: #8B4513;
-            color: #FFFFFF;
-        }
-        select:disabled {
-            background-color: #F3F4F6;
-            cursor: not-allowed;
-        }
-        #geneticsGuide dl dt {
-            font-weight: 700;
-            color: #8B4513;
-            margin-top: 1rem;
-        }
-        #geneticsGuide dl dd {
-            margin-left: 1.5rem;
-            margin-bottom: 0.5rem;
-        }
-        .kitten-list li {
-            background-color: #FDFBF6;
-            border-left: 3px solid #A0522D;
-        }
-    </style>
+    <title>Feline Color Genetics Data Tables</title>
 </head>
-<body class="bg-stone-100 text-stone-800">
 
-    <div class="container mx-auto p-4 md:p-8 max-w-5xl">
-        <header class="text-center mb-8">
-            <h1 class="text-4xl md:text-5xl font-bold text-amber-900">Feline Genetics Predictor</h1>
-            <p class="text-stone-600 mt-2 text-lg">An interactive tool to predict kitten colors and patterns.</p>
-        </header>
+<body>
 
-        <main>
-            <div class="control-panel p-6 rounded-lg shadow-lg mb-8">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <!-- Sire (Male) Panel -->
-                    <div>
-                        <h2 class="text-2xl font-bold text-amber-800 border-b-2 border-amber-800 pb-2 mb-4">Sire (Male)</h2>
-                        <div class="space-y-4">
-                            <div>
-                                <label for="maleColour" class="block text-sm font-medium text-stone-700">Colour</label>
-                                <select id="maleColour" class="mt-1 block w-full py-2 px-3 border border-stone-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-amber-500 focus:border-amber-500"></select>
-                            </div>
-                            <div>
-                                <label for="maleDilute" class="block text-sm font-medium text-stone-700">Dilute Gene</label>
-                                <select id="maleDilute" class="mt-1 block w-full py-2 px-3 border border-stone-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-amber-500 focus:border-amber-500"></select>
-                            </div>
-                            <div>
-                                <label for="maleBrown" class="block text-sm font-medium text-stone-700">Brown (Chocolate) Gene</label>
-                                <select id="maleBrown" class="mt-1 block w-full py-2 px-3 border border-stone-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-amber-500 focus:border-amber-500"></select>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Dam (Female) Panel -->
-                    <div>
-                        <h2 class="text-2xl font-bold text-amber-800 border-b-2 border-amber-800 pb-2 mb-4">Dam (Female)</h2>
-                        <div class="space-y-4">
-                            <div>
-                                <label for="femaleColour" class="block text-sm font-medium text-stone-700">Colour</label>
-                                <select id="femaleColour" class="mt-1 block w-full py-2 px-3 border border-stone-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-amber-500 focus:border-amber-500"></select>
-                            </div>
-                            <div>
-                                <label for="femaleDilute" class="block text-sm font-medium text-stone-700">Dilute Gene</label>
-                                <select id="femaleDilute" class="mt-1 block w-full py-2 px-3 border border-stone-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-amber-500 focus:border-amber-500"></select>
-                            </div>
-                            <div>
-                                <label for="femaleBrown" class="block text-sm font-medium text-stone-700">Brown (Chocolate) Gene</label>
-                                <select id="femaleBrown" class="mt-1 block w-full py-2 px-3 border border-stone-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-amber-500 focus:border-amber-500"></select>
-                            </div>
-                            <div class="flex items-center pt-2">
-                                <input id="femaleTortie" type="checkbox" class="h-4 w-4 text-amber-600 focus:ring-amber-500 border-stone-300 rounded">
-                                <label for="femaleTortie" id="tortieLabel" class="ml-2 block text-sm font-medium text-stone-700">Tortoiseshell</label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+    <h1>Feline Color Genetics: Consolidated Data Tables</h1>
 
-                <div class="mt-8 text-center">
-                    <button id="predictBtn" class="btn-predict font-bold py-3 px-8 rounded-lg shadow-md text-xl">Predict Kittens</button>
-                </div>
-            </div>
+    <hr>
 
-            <div id="resultsContainer" class="hidden">
-                <h2 class="text-3xl font-bold text-center text-amber-900 mb-6">Predicted Offspring</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="results-card rounded-lg shadow-lg p-6">
-                        <h3 class="text-2xl font-bold text-amber-800 mb-4 text-center">Male Kittens</h3>
-                        <ul id="maleResults" class="space-y-2 kitten-list"></ul>
-                    </div>
-                    <div class="results-card rounded-lg shadow-lg p-6">
-                        <h3 class="text-2xl font-bold text-amber-800 mb-4 text-center">Female Kittens</h3>
-                        <ul id="femaleResults" class="space-y-2 kitten-list"></ul>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="text-center mt-12">
-                <button id="toggleGuideBtn" class="btn-guide font-bold py-2 px-6 rounded-lg">Show Genetics Guide</button>
-            </div>
+    <h2>Section 1: Feline Color Genetics Cheatsheet & Lexicon</h2>
 
-            <div id="geneticsGuide" class="hidden mt-8 control-panel p-6 rounded-lg shadow-lg">
-                <h2 class="text-3xl font-bold text-amber-900 mb-4">Feline Genetics Guide</h2>
-                <p class="mb-6 text-stone-600">This guide explains the core genetic principles used by the predictor to determine potential offspring colors and patterns. Understanding these concepts will help you interpret the results more effectively.</p>
+    <h3>1.1. Core Genetic Concepts</h3>
+    <ul>
+        <li><strong>Orange (Sex-Linked Red)</strong>: Located on the X-chromosome. It is epistatic, meaning it masks the
+            expression of the black/brown gene.</li>
+        <li><strong>Brown (Black vs. Chocolate)</strong>: An autosomal gene determining if the base pigment is black (B)
+            or brown/chocolate (b). This is a recessive trait.</li>
+        <li><strong>Dilute (Dense vs. Dilute)</strong>: An autosomal gene that lightens the base coat color. This is a
+            recessive trait.</li>
+    </ul>
+
+    <h3>1.2. Gene & Allele Lexicon</h3>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Gene</th>
+                <th>Allele</th>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Dominant/Recessive</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Orange</strong></td>
+                <td>`XO`</td>
+                <td>Orange</td>
+                <td>Produces orange-based pigment (Red, Cream).</td>
+                <td>Dominant</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>`Xo`</td>
+                <td>Non-Orange</td>
+                <td>Allows expression of black/brown pigment.</td>
+                <td>Recessive</td>
+            </tr>
+            <tr>
+                <td><strong>Gender</strong></td>
+                <td>`Y`</td>
+                <td>Y Chrom.</td>
+                <td>Determines male sex.</td>
+                <td>-</td>
+            </tr>
+            <tr>
+                <td><strong>Brown</strong></td>
+                <td>`B`</td>
+                <td>Black</td>
+                <td>Produces black eumelanin pigment (Seal, Blue).</td>
+                <td>Dominant</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>`b`</td>
+                <td>Chocolate</td>
+                <td>Modifies black pigment to brown (Chocolate, Lilac).</td>
+                <td>Recessive</td>
+            </tr>
+            <tr>
+                <td><strong>Dilute</strong></td>
+                <td>`D`</td>
+                <td>Dense</td>
+                <td>Pigment is dense and dark (Seal, Red, Chocolate).</td>
+                <td>Dominant</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>`d`</td>
+                <td>Dilute</td>
+                <td>Pigment is lightened (Blue, Cream, Lilac).</td>
+                <td>Recessive</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>1.3. Genotype to Phenotype Key</h3>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Phenotype (Color)</th>
+                <th>Required Genes</th>
+                <th>Common Genotypes</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Seal</strong></td>
+                <td>Non-Orange, Black, Dense</td>
+                <td>`XoY BB DD` or `XoXo BB DD`</td>
+            </tr>
+            <tr>
+                <td><strong>Seal</strong> (carries choc)</td>
+                <td>Non-Orange, Black (het), Dense</td>
+                <td>`XoY Bb DD` or `XoXo Bb DD`</td>
+            </tr>
+            <tr>
+                <td><strong>Seal</strong> (carries dilute)</td>
+                <td>Non-Orange, Black, Dense (het)</td>
+                <td>`XoY BB Dd` or `XoXo BB Dd`</td>
+            </tr>
+            <tr>
+                <td><strong>Seal</strong> (carries choc/dilute)</td>
+                <td>Non-Orange, Black (het), Dense (het)</td>
+                <td>`XoY Bb Dd` or `XoXo Bb Dd`</td>
+            </tr>
+            <tr>
+                <td><strong>Blue</strong></td>
+                <td>Non-Orange, Black, Dilute</td>
+                <td>`XoY BB dd` or `XoXo BB dd`</td>
+            </tr>
+            <tr>
+                <td><strong>Blue</strong> (carries choc)</td>
+                <td>Non-Orange, Black (het), Dilute</td>
+                <td>`XoY Bb dd` or `XoXo Bb dd`</td>
+            </tr>
+            <tr>
+                <td><strong>Chocolate</strong></td>
+                <td>Non-Orange, Chocolate, Dense</td>
+                <td>`XoY bb DD` or `XoXo bb DD`</td>
+            </tr>
+            <tr>
+                <td><strong>Chocolate</strong> (carries dilute)</td>
+                <td>Non-Orange, Chocolate, Dense (het)</td>
+                <td>`XoY bb Dd` or `XoXo bb Dd`</td>
+            </tr>
+            <tr>
+                <td><strong>Lilac</strong></td>
+                <td>Non-Orange, Chocolate, Dilute</td>
+                <td>`XoY bb dd` or `XoXo bb dd`</td>
+            </tr>
+            <tr>
+                <td><strong>Red</strong></td>
+                <td>Orange, Dense</td>
+                <td>`XOY D_` or `XOXO D_`</td>
+            </tr>
+            <tr>
+                <td><strong>Red</strong> (carries dilute)</td>
+                <td>Orange, Dense (het)</td>
+                <td>`XOY Dd` or `XOXO Dd`</td>
+            </tr>
+            <tr>
+                <td><strong>Cream</strong></td>
+                <td>Orange, Dilute</td>
+                <td>`XOY dd` or `XOXO dd`</td>
+            </tr>
+            <tr>
+                <td><strong>Tortoiseshell</strong> (Female only)</td>
+                <td>Heterozygous Orange (`XOXo`)</td>
+                <td>Examples: `XOXo BB DD` (Seal Tortie), `XOXo bb dd` (Lilac Tortie)</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>1.4. Inheritance Pattern Cheatsheet</h3>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>If you cross...</th>
+                <th>You will get...</th>
+                <th>You will <strong>NEVER</strong> get...</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Dilute x Dilute</strong> (e.g., Blue x Blue)</td>
+                <td>100% Dilute kittens (Blue, Cream, Lilac).</td>
+                <td>Dense kittens (Seal, Red, Chocolate).</td>
+            </tr>
+            <tr>
+                <td><strong>Homozygous Chocolate x Homozygous Chocolate</strong></td>
+                <td>100% Chocolate-based kittens (Chocolate, Lilac).</td>
+                <td>Black-based kittens (Seal, Blue).</td>
+            </tr>
+            <tr>
+                <td><strong>Non-Dilute x Non-Dilute</strong></td>
+                <td>If <strong>both</strong> parents carry dilute (`Dd`), you can get both Dense and Dilute kittens.
+                </td>
+                <td>-</td>
+            </tr>
+            <tr>
+                <td><strong>Red Male (`XOY`) x Non-Orange Female (`XoXo`)</strong></td>
+                <td>100% Non-Orange Males (`XoY`), 100% Tortie Females (`XOXo`).</td>
+                <td>Red males, Red females, or Non-Orange females.</td>
+            </tr>
+            <tr>
+                <td><strong>Non-Orange Male (`XoY`) x Red Female (`XOXO`)</strong></td>
+                <td>100% Red Males (`XOY`), 100% Tortie Females (`XOXo`).</td>
+                <td>Non-Orange males, Red females, or Non-Orange females.</td>
+            </tr>
+            <tr>
+                <td><strong>Red Male (`XOY`) x Red Female (`XOXO`)</strong></td>
+                <td>100% Red kittens.</td>
+                <td>Kittens of any other color.</td>
+            </tr>
+            <tr>
+                <td><strong>Any Sire x Tortie Dam (`XOXo`)</strong></td>
+                <td>Both Orange and Non-Orange males; both Non-Orange and Tortie females.</td>
+                <td>-</td>
+            </tr>
+            <tr>
+                <td><strong>Any Sire x Non-Orange Dam (`XoXo`)</strong></td>
+                <td><strong>No</strong> Tortie females.</td>
+                <td>Tortie females.</td>
+            </tr>
+            <tr>
+                <td>Two parents that are <strong>NOT</strong> chocolate-based (`BB` or `Bb`)</td>
+                <td>If <strong>both</strong> parents carry chocolate (`Bb`), you can get both black-based and
+                    chocolate-based kittens.</td>
+                <td>-</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <hr>
+
+    <h2>Section 2: Feline Offspring Genotype and Phenotype Predictions</h2>
+    <p>This section details potential offspring based on parental genotypes. The tables show expected genotypes and
+        their corresponding phenotypes.</p>
+
+    <h3>2.1 Table 1: Basic Black-Based Pairings (No Chocolate Gene: BB)</h3>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Male Parent Genotype</th>
+                <th>Female Parent Genotype</th>
+                <th>Predicted Male Offspring (Genotype -&gt; Phenotype)</th>
+                <th>Predicted Female Offspring (Genotype -&gt; Phenotype)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><code>XoY BB DD</code> (Seal)</td>
+                <td><code>XoXo BB DD</code> (Seal)</td>
+                <td><code>XoY BB DD</code> -&gt; Seal</td>
+                <td><code>XoXo BB DD</code> -&gt; Seal</td>
+            </tr>
+            <tr>
+                <td><code>XoY BB DD</code> (Seal)</td>
+                <td><code>XoXo BB dd</code> (Blue)</td>
+                <td><code>XoY BB Dd</code> -&gt; Seal (carries dilute)</td>
+                <td><code>XoXo BB Dd</code> -&gt; Seal (carries dilute)</td>
+            </tr>
+            <tr>
+                <td><code>XoY BB dd</code> (Blue)</td>
+                <td><code>XoXo BB DD</code> (Seal)</td>
+                <td><code>XoY BB Dd</code> -&gt; Seal (carries dilute)</td>
+                <td><code>XoXo BB Dd</code> -&gt; Seal (carries dilute)</td>
+            </tr>
+            <tr>
+                <td><code>XoY BB dd</code> (Blue)</td>
+                <td><code>XoXo BB dd</code> (Blue)</td>
+                <td><code>XoY BB dd</code> -&gt; Blue</td>
+                <td><code>XoXo BB dd</code> -&gt; Blue</td>
+            </tr>
+            <tr>
+                <td><code>XoY BB Dd</code> (Seal, carries dilute)</td>
+                <td><code>XoXo BB Dd</code> (Seal, carries dilute)</td>
+                <td><code>XoY BB DD</code> -&gt; Seal<br><code>XoY BB Dd</code> -&gt; Seal (carries
+                    dilute)<br><code>XoY BB dd</code> -&gt; Blue</td>
+                <td><code>XoXo BB DD</code> -&gt; Seal<br><code>XoXo BB Dd</code> -&gt; Seal (carries
+                    dilute)<br><code>XoXo BB dd</code> -&gt; Blue</td>
+            </tr>
+            <tr>
+                <td><code>XoY BB Dd</code> (Seal, carries dilute)</td>
+                <td><code>XoXo BB dd</code> (Blue)</td>
+                <td><code>XoY BB Dd</code> -&gt; Seal (carries dilute)<br><code>XoY BB dd</code> -&gt; Blue</td>
+                <td><code>XoXo BB Dd</code> -&gt; Seal (carries dilute)<br><code>XoXo BB dd</code> -&gt; Blue</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>2.2 Table 2: Red/Cream and Black-Based Pairings (No Chocolate Gene: BB)</h3>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Male Parent Genotype</th>
+                <th>Female Parent Genotype</th>
+                <th>Predicted Male Offspring (Genotype -&gt; Phenotype)</th>
+                <th>Predicted Female Offspring (Genotype -&gt; Phenotype)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><code>XOY BB DD</code> (Red)</td>
+                <td><code>XoXo BB DD</code> (Seal)</td>
+                <td><code>XoY BB DD</code> -&gt; Seal</td>
+                <td><code>XOXo BB DD</code> -&gt; Seal Tortie</td>
+            </tr>
+            <tr>
+                <td><code>XOY BB DD</code> (Red)</td>
+                <td><code>XoXo BB dd</code> (Blue)</td>
+                <td><code>XoY BB Dd</code> -&gt; Seal (carries dilute)</td>
+                <td><code>XOXo BB Dd</code> -&gt; Seal Tortie (carries dilute)</td>
+            </tr>
+            <tr>
+                <td><code>XOY BB dd</code> (Cream)</td>
+                <td><code>XoXo BB DD</code> (Seal)</td>
+                <td><code>XoY BB Dd</code> -&gt; Seal (carries dilute)</td>
+                <td><code>XOXo BB Dd</code> -&gt; Seal Tortie (carries dilute)</td>
+            </tr>
+            <tr>
+                <td><code>XOY BB dd</code> (Cream)</td>
+                <td><code>XoXo BB dd</code> (Blue)</td>
+                <td><code>XoY BB dd</code> -&gt; Blue</td>
+                <td><code>XOXo BB dd</code> -&gt; Blue Tortie</td>
+            </tr>
+            <tr>
+                <td><code>XoY BB DD</code> (Seal)</td>
+                <td><code>XOXO BB DD</code> (Red)</td>
+                <td><code>XOY BB DD</code> -&gt; Red</td>
+                <td><code>XOXo BB DD</code> -&gt; Seal Tortie</td>
+            </tr>
+            <tr>
+                <td><code>XoY BB DD</code> (Seal)</td>
+                <td><code>XOXO BB dd</code> (Cream)</td>
+                <td><code>XOY BB Dd</code> -&gt; Red (carries dilute)</td>
+                <td><code>XOXo BB Dd</code> -&gt; Seal Tortie (carries dilute)</td>
+            </tr>
+            <tr>
+                <td><code>XoY BB dd</code> (Blue)</td>
+                <td><code>XOXO BB DD</code> (Red)</td>
+                <td><code>XOY BB Dd</code> -&gt; Red (carries dilute)</td>
+                <td><code>XOXo BB Dd</code> -&gt; Seal Tortie (carries dilute)</td>
+            </tr>
+            <tr>
+                <td><code>XoY BB dd</code> (Blue)</td>
+                <td><code>XOXO BB dd</code> (Cream)</td>
+                <td><code>XOY BB dd</code> -&gt; Cream</td>
+                <td><code>XOXo BB dd</code> -&gt; Blue Tortie</td>
+            </tr>
+            <tr>
+                <td><code>XOY BB DD</code> (Red)</td>
+                <td><code>XOXO BB DD</code> (Red)</td>
+                <td><code>XOY BB DD</code> -&gt; Red</td>
+                <td><code>XOXO BB DD</code> -&gt; Red</td>
+            </tr>
+            <tr>
+                <td><code>XOY BB dd</code> (Cream)</td>
+                <td><code>XOXO BB dd</code> (Cream)</td>
+                <td><code>XOY BB dd</code> -&gt; Cream</td>
+                <td><code>XOXO BB dd</code> -&gt; Cream</td>
+            </tr>
+            <tr>
+                <td><code>XOY BB Dd</code> (Red, carries dilute)</td>
+                <td><code>XOXO BB dd</code> (Cream)</td>
+                <td><code>XOY BB Dd</code> -&gt; Red (carries dilute)<br><code>XOY BB dd</code> -&gt; Cream</td>
+                <td><code>XOXO BB Dd</code> -&gt; Red (carries dilute)<br><code>XOXO BB dd</code> -&gt; Cream</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>2.3 Table 3: Pairings Involving the Chocolate Gene (b)</h3>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Male Parent Genotype</th>
+                <th>Female Parent Genotype</th>
+                <th>Predicted Male Offspring (Genotype -> Phenotype)</th>
+                <th>Predicted Female Offspring (Genotype -> Phenotype)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><code>XoY bb DD</code> (Chocolate)</td>
+                <td><code>XoXo bb DD</code> (Chocolate)</td>
+                <td><code>XoY bb DD</code> -> Chocolate</td>
+                <td><code>XoXo bb DD</code> -> Chocolate</td>
+            </tr>
+            <tr>
+                <td><code>XoY bb dd</code> (Lilac)</td>
+                <td><code>XoXo bb dd</code> (Lilac)</td>
+                <td><code>XoY bb dd</code> -> Lilac</td>
+                <td><code>XoXo bb dd</code> -> Lilac</td>
+            </tr>
+            <tr>
+                <td><code>XoY Bb DD</code> (Seal, carries choc)</td>
+                <td><code>XoXo bb DD</code> (Chocolate)</td>
+                <td><code>XoY Bb DD</code> -> Seal (carries choc)<br><code>XoY bb DD</code> -> Chocolate</td>
+                <td><code>XoXo Bb DD</code> -> Seal (carries choc)<br><code>XoXo bb DD</code> -> Chocolate</td>
+            </tr>
+            <tr>
+                <td><code>XoY Bb DD</code> (Seal, carries choc)</td>
+                <td><code>XoXo Bb DD</code> (Seal, carries choc)</td>
+                <td><code>XoY BB DD</code> -> Seal<br><code>XoY Bb DD</code> -> Seal (carries
+                    choc)<br><code>XoY bb DD</code> -> Chocolate</td>
+                <td><code>XoXo BB DD</code> -> Seal<br><code>XoXo Bb DD</code> -> Seal (carries
+                    choc)<br><code>XoXo bb DD</code> -> Chocolate</td>
+            </tr>
+            <tr>
+                <td><code>XoY Bb dd</code> (Blue, carries choc)</td>
+                <td><code>XoXo bb dd</code> (Lilac)</td>
+                <td><code>XoY Bb dd</code> -> Blue (carries choc)<br><code>XoY bb dd</code> -> Lilac</td>
+                <td><code>XoXo Bb dd</code> -> Blue (carries choc)<br><code>XoXo bb dd</code> -> Lilac</td>
+            </tr>
+            <tr>
+                <td><code>XOY bb DD</code> (Red, homozygous choc)</td>
+                <td><code>XoXo BB DD</code> (Seal)</td>
+                <td><code>XoY Bb DD</code> -> Seal (carries choc)</td>
+                <td><code>XOXo Bb DD</code> -> Seal Tortie (carries choc)</td>
+            </tr>
+            <tr>
+                <td><code>XOY Bb DD</code> (Red, carries choc)</td>
+                <td><code>XoXo bb DD</code> (Chocolate)</td>
+                <td><code>XoY Bb DD</code> -> Seal (carries choc)<br><code>XoY bb DD</code> -> Chocolate</td>
+                <td><code>XOXo Bb DD</code> -> Seal Tortie (carries choc)<br><code>XOXo bb DD</code> -> Chocolate Tortie
+                </td>
+            </tr>
+            <tr>
+                <td><code>XoY bb dd</code> (Lilac)</td>
+                <td><code>XOXO BB DD</code> (Red)</td>
+                <td><code>XOY Bb Dd</code> -> Red (carries choc, carries dilute)</td>
+                <td><code>XOXo Bb Dd</code> -> Seal Tortie (carries choc, carries dilute)</td>
+            </tr>
+        </tbody>
+    </table>
+        </tbody>
+    </table>
+
+    <h3>2.4 Table 4: Tortoiseshell Female Pairings</h3>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Male Parent Genotype</th>
+                <th>Female Parent Genotype (Tortie)</th>
+                <th>Predicted Male Offspring (Genotype -> Phenotype)</th>
+                <th>Predicted Female Offspring (Genotype -> Phenotype)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><code>XoY BB DD</code> (Seal)</td>
+                <td><code>XOXo BB DD</code> (Seal Tortie)</td>
+                <td><code>XoY BB DD</code> -> Seal<br><code>XOY BB DD</code> -> Red</td>
+                <td><code>XoXo BB DD</code> -> Seal<br><code>XOXo BB DD</code> -> Seal Tortie</td>
+            </tr>
+            <tr>
+                <td><code>XoY BB dd</code> (Blue)</td>
+                <td><code>XOXo BB Dd</code> (Seal Tortie, carries dilute)</td>
+                <td><code>XoY BB Dd</code> -> Seal (carries dilute)<br><code>XOY BB Dd</code> -> Red (carries
+                    dilute)<br><code>XoY BB dd</code> -> Blue<br><code>XOY BB dd</code> -> Cream</td>
+                <td><code>XoXo BB Dd</code> -> Seal (carries dilute)<br><code>XOXo BB Dd</code> -> Seal Tortie (carries
+                    dilute)<br><code>XoXo BB dd</code> -> Blue<br><code>XOXo BB dd</code> -> Blue Tortie</td>
+            </tr>
+            <tr>
+                <td><code>XOY BB DD</code> (Red)</td>
+                <td><code>XOXo BB DD</code> (Seal Tortie)</td>
+                <td><code>XoY BB DD</code> -> Seal<br><code>XOY BB DD</code> -> Red</td>
+                <td><code>XOXO BB DD</code> -> Red<br><code>XOXo BB DD</code> -> Seal Tortie</td>
+            </tr>
+            <tr>
+                <td><code>XoY bb DD</code> (Chocolate)</td>
+                <td><code>XOXo bb dd</code> (Lilac Tortie)</td>
+                <td><code>XoY bb Dd</code> -> Chocolate (carries dilute)<br><code>XOY bb Dd</code> -> Red (homozygous
+                    choc, carries dilute)<br><code>XoY bb dd</code> -> Lilac<br><code>XOY bb dd</code> -> Cream
+                    (homozygous choc)</td>
+                <td><code>XoXo bb Dd</code> -> Chocolate (carries dilute)<br><code>XOXo bb Dd</code> -> Chocolate Tortie
+                    (carries dilute)<br><code>XoXo bb dd</code> -> Lilac<br><code>XOXo bb dd</code> -> Lilac Tortie</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <hr>
+
+    <h2>Section 3: Master Offspring Prediction Table</h2>
+    <p>This table lists all primary color pairings and their potential offspring phenotypes, assuming parents may carry
+        hidden traits.</p>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Male Parent</th>
+                <th>Female Parent</th>
+                <th>Predicted Male Offspring</th>
+                <th>Predicted Female Offspring</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Seal</strong></td>
+                <td><strong>Seal</strong></td>
+                <td>Seal, Blue</td>
+                <td>Seal, Blue</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td><strong>Blue</strong></td>
+                <td>Seal (carries dilute), Blue</td>
+                <td>Seal (carries dilute), Blue</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td><strong>Chocolate</strong></td>
+                <td>Seal (carries choc), Chocolate</td>
+                <td>Seal (carries choc), Chocolate</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td><strong>Lilac</strong></td>
+                <td>Seal (carries choc, carries dilute), Chocolate (carries dilute)</td>
+                <td>Seal (carries choc, carries dilute), Chocolate (carries dilute)</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td><strong>Red</strong></td>
+                <td>Red, Cream</td>
+                <td>Seal Tortie, Blue Tortie</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td><strong>Cream</strong></td>
+                <td>Red (carries dilute), Cream</td>
+                <td>Seal Tortie (carries dilute), Blue Tortie</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td><strong>Seal Tortie</strong></td>
+                <td>Seal, Blue, Red, Cream</td>
+                <td>Seal, Blue, Seal Tortie, Blue Tortie</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td><strong>Blue Tortie</strong></td>
+                <td>Seal (carries dilute), Blue, Red (carries dilute), Cream</td>
+                <td>Seal (carries dilute), Blue, Seal Tortie (carries dilute), Blue Tortie</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td><strong>Chocolate Tortie</strong></td>
+                <td>Seal (carries choc), Chocolate, Red, Cream</td>
+                <td>Seal Tortie (carries choc), Chocolate Tortie</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td><strong>Lilac Tortie</strong></td>
+                <td>Seal (carries choc, carries dilute), Chocolate (carries dilute), Red (carries dilute), Cream</td>
+                <td>Seal Tortie (carries choc, carries dilute), Chocolate Tortie (carries dilute)</td>
+            </tr>
+            <tr>
+                <td><strong>Blue</strong></td>
+                <td><strong>Blue</strong></td>
+                <td>Blue</td>
+                <td>Blue</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td><strong>Chocolate</strong></td>
+                <td>Seal (carries choc, carries dilute), Chocolate (carries dilute)</td>
+                <td>Seal (carries choc, carries dilute), Chocolate (carries dilute)</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td><strong>Lilac</strong></td>
+                <td>Blue (carries choc), Lilac</td>
+                <td>Blue (carries choc), Lilac</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td><strong>Red</strong></td>
+                <td>Red (carries dilute), Cream</td>
+                <td>Seal Tortie (carries dilute), Blue Tortie</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td><strong>Cream</strong></td>
+                <td>Cream</td>
+                <td>Blue Tortie</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td><strong>Seal Tortie</strong></td>
+                <td>Seal (carries dilute), Blue, Red (carries dilute), Cream</td>
+                <td>Seal (carries dilute), Blue, Seal Tortie (carries dilute), Blue Tortie</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td><strong>Blue Tortie</strong></td>
+                <td>Blue, Cream</td>
+                <td>Blue, Blue Tortie</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td><strong>Chocolate Tortie</strong></td>
+                <td>Seal (carries choc, carries dilute), Chocolate (carries dilute), Red (carries dilute), Cream</td>
+                <td>Seal Tortie (carries choc, carries dilute), Chocolate Tortie (carries dilute)</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td><strong>Lilac Tortie</strong></td>
+                <td>Blue (carries choc), Lilac, Cream</td>
+                <td>Blue Tortie (carries choc), Lilac Tortie</td>
+            </tr>
+            <tr>
+                <td><strong>Chocolate</strong></td>
+                <td><strong>Chocolate</strong></td>
+                <td>Chocolate, Lilac</td>
+                <td>Chocolate, Lilac</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td><strong>Lilac</strong></td>
+                <td>Chocolate (carries dilute), Lilac</td>
+                <td>Chocolate (carries dilute), Lilac</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td><strong>Red</strong></td>
+                <td>Red, Cream</td>
+                <td>Seal Tortie (carries choc), Blue Tortie (carries choc), Chocolate Tortie, Lilac Tortie</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td><strong>Cream</strong></td>
+                <td>Red (carries dilute), Cream</td>
+                <td>Seal Tortie (carries choc, carries dilute), Blue Tortie (carries choc), Chocolate Tortie (carries
+                    dilute), Lilac Tortie</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td><strong>Seal Tortie</strong></td>
+                <td>Seal (carries choc), Chocolate, Red, Cream</td>
+                <td>Seal (carries choc), Chocolate, Seal Tortie (carries choc), Chocolate Tortie</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td><strong>Blue Tortie</strong></td>
+                <td>Seal (carries choc, carries dilute), Chocolate (carries dilute), Red (carries dilute), Cream</td>
+                <td>Seal (carries choc, carries dilute), Chocolate (carries dilute), Seal Tortie (carries choc, carries
+                    dilute), Chocolate Tortie (carries dilute)</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td><strong>Chocolate Tortie</strong></td>
+                <td>Chocolate, Lilac, Red, Cream</td>
+                <td>Chocolate, Lilac, Chocolate Tortie, Lilac Tortie</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td><strong>Lilac Tortie</strong></td>
+                <td>Chocolate (carries dilute), Lilac, Red (carries dilute), Cream</td>
+                <td>Chocolate (carries dilute), Lilac, Chocolate Tortie (carries dilute), Lilac Tortie</td>
+            </tr>
+            <tr>
+                <td><strong>Lilac</strong></td>
+                <td><strong>Lilac</strong></td>
+                <td>Lilac</td>
+                <td>Lilac</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td><strong>Red</strong></td>
+                <td>Red (carries dilute), Cream</td>
+                <td>Seal Tortie (carries choc, carries dilute), Blue Tortie (carries choc), Chocolate Tortie (carries
+                    dilute), Lilac Tortie</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td><strong>Cream</strong></td>
+                <td>Cream</td>
+                <td>Blue Tortie (carries choc), Lilac Tortie</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td><strong>Seal Tortie</strong></td>
+                <td>Seal (carries choc, carries dilute), Chocolate (carries dilute), Red (carries dilute), Cream</td>
+                <td>Seal (carries choc, carries dilute), Chocolate (carries dilute), Seal Tortie (carries choc, carries
+                    dilute), Chocolate Tortie (carries dilute)</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td><strong>Blue Tortie</strong></td>
                 
-                <h3 class="text-xl font-bold text-amber-800 border-b border-amber-800 pb-1 mb-2">Core Genetic Concepts</h3>
-                <dl>
-                    <dt>Orange Gene (Sex-Linked Red)</dt>
-                    <dd>Located on the X-chromosome, this gene determines if a cat will be red-based or black-based. It is 'epistatic', meaning it masks the black/brown gene. A male (XY) gets one copy, while a female (XX) gets two.</dd>
-                    
-                    <dt>Brown Gene (Black vs. Chocolate)</dt>
-                    <dd>This gene modifies the base black pigment. The allele for black (`B`) is dominant over the allele for chocolate (`b`). A cat must have two copies of the chocolate allele (`bb`) to be chocolate-colored.</dd>
-
-                    <dt>Dilute Gene (Dense vs. Dilute)</dt>
-                    <dd>This gene affects the intensity of a color. The allele for dense color (`D`) is dominant over the allele for dilute (`d`). A cat must have two copies of the dilute allele (`dd`) for its coat to be diluted (e.g., Seal becomes Blue, Red becomes Cream).</dd>
-                </dl>
-                
-                <h3 class="text-xl font-bold text-amber-800 border-b border-amber-800 pb-1 mt-6 mb-2">Genotype to Phenotype Key</h3>
-                <div class="overflow-x-auto">
-                    <table class="min-w-full bg-white rounded-lg mt-2">
-                        <thead class="bg-amber-800 text-white">
-                            <tr>
-                                <th class="py-2 px-4 text-left">Phenotype (Color)</th>
-                                <th class="py-2 px-4 text-left">Required Genes</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-stone-200">
-                            <tr><td class="py-2 px-4">Seal</td><td class="py-2 px-4">Non-Orange, Black-based, Dense</td></tr>
-                            <tr class="bg-stone-50"><td class="py-2 px-4">Blue</td><td class="py-2 px-4">Non-Orange, Black-based, Dilute</td></tr>
-                            <tr><td class="py-2 px-4">Chocolate</td><td class="py-2 px-4">Non-Orange, Chocolate-based, Dense</td></tr>
-                            <tr class="bg-stone-50"><td class="py-2 px-4">Lilac</td><td class="py-2 px-4">Non-Orange, Chocolate-based, Dilute</td></tr>
-                            <tr><td class="py-2 px-4">Red</td><td class="py-2 px-4">Orange, Dense</td></tr>
-                            <tr class="bg-stone-50"><td class="py-2 px-4">Cream</td><td class="py-2 px-4">Orange, Dilute</td></tr>
-                            <tr><td class="py-2 px-4">Tortoiseshell</td><td class="py-2 px-4">Female only, with one Orange and one Non-Orange gene (XOXo)</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </main>
-        
-        <footer class="text-center text-sm text-stone-500 mt-12 py-4 border-t border-stone-200">
-            <p>Genetics based on the logic from the `newpredictor.js` script.</p>
-            <p>&copy; 2025 Feline Genetics Predictor. All Rights Reserved.</p>
-        </footer>
-    </div>
-
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-
-    const GENE = {
-        GENDER: { O: 'O', X: 'X', Y: 'Y' },
-        DILUTE: { D: 'D', d: 'd' },
-        BROWN: { B: 'B', b: 'b' }
-    };
-    
-    const GENE_EXPR = { None: 0, Homo: 1, Hetero: 2 };
-
-    const CARRYING = {
-        NotApplicable: { val: 'NotApplicable', text: 'Not Applicable' },
-        Unknown: { val: 'Unknown', text: 'Don\'t Know' },
-        NotCarrying: { val: 'NotCarrying', text: 'Not Carrying' },
-        Carrying: { val: 'Carrying', text: 'Carrying' },
-        Homozygous: { val: 'Homozygous', text: 'Homozygous' }
-    };
-
-    const COLOURS = {
-        Red: {
-            text: 'Red',
-            diluteOptions: [CARRYING.NotCarrying, CARRYING.Carrying],
-            brownOptions: [CARRYING.NotCarrying, CARRYING.Carrying, CARRYING.Homozygous]
-        },
-        Cream: {
-            text: 'Cream',
-            diluteOptions: [],
-            brownOptions: [CARRYING.NotCarrying, CARRYING.Carrying, CARRYING.Homozygous]
-        },
-        Seal: {
-            text: 'Seal',
-            diluteOptions: [CARRYING.NotCarrying, CARRYING.Carrying],
-            brownOptions: [CARRYING.NotCarrying, CARRYING.Carrying]
-        },
-        Chocolate: {
-            text: 'Chocolate',
-            diluteOptions: [CARRYING.NotCarrying, CARRYING.Carrying],
-            brownOptions: []
-        },
-        Blue: {
-            text: 'Blue',
-            diluteOptions: [],
-            brownOptions: [CARRYING.NotCarrying, CARRYING.Carrying]
-        },
-        Lilac: {
-            text: 'Lilac',
-            diluteOptions: [],
-            brownOptions: []
-        }
-    };
-    
-    class GenePair {
-        constructor(one, two) {
-            this.one = one;
-            this.two = two;
-        }
-    }
-
-    class Cat {
-        constructor() {
-            this.gender = null;
-            this.dilute = null;
-            this.brown = null;
-        }
-
-        setMale(colourKey, diluteCarry, brownCarry) {
-            this.gender = (colourKey === 'Red' || colourKey === 'Cream') ? new GenePair(GENE.GENDER.Y, GENE.GENDER.O) : new GenePair(GENE.GENDER.Y, GENE.GENDER.X);
-            this.setDiluteAndBrown(colourKey, diluteCarry, brownCarry);
-        }
-
-        setFemale(colourKey, isTortie, diluteCarry, brownCarry) {
-            if (colourKey === 'Red' || colourKey === 'Cream') {
-                this.gender = new GenePair(GENE.GENDER.O, GENE.GENDER.O);
-            } else {
-                this.gender = isTortie ? new GenePair(GENE.GENDER.X, GENE.GENDER.O) : new GenePair(GENE.GENDER.X, GENE.GENDER.X);
-            }
-            this.setDiluteAndBrown(colourKey, diluteCarry, brownCarry);
-        }
-
-        setDiluteAndBrown(colourKey, diluteCarry, brownCarry) {
-            let diluteSet = false;
-            let brownSet = false;
-
-            if (colourKey === 'Cream' || colourKey === 'Blue' || colourKey === 'Lilac') {
-                this.dilute = new GenePair(GENE.DILUTE.d, GENE.DILUTE.d);
-                diluteSet = true;
-            }
-            if (colourKey === 'Chocolate' || colourKey === 'Lilac') {
-                this.brown = new GenePair(GENE.BROWN.b, GENE.BROWN.b);
-                brownSet = true;
-            }
-            
-            if (!diluteSet) {
-                if (diluteCarry === 'NotCarrying') this.dilute = new GenePair(GENE.DILUTE.D, GENE.DILUTE.D);
-                else if (diluteCarry === 'Carrying') this.dilute = new GenePair(GENE.DILUTE.D, GENE.DILUTE.d);
-                else this.dilute = new GenePair(GENE.DILUTE.D, GENE.DILUTE.D); // Default
-            }
-
-            if (!brownSet) {
-                 if (brownCarry === 'NotCarrying') this.brown = new GenePair(GENE.BROWN.B, GENE.BROWN.B);
-                 else if (brownCarry === 'Carrying') this.brown = new GenePair(GENE.BROWN.B, GENE.BROWN.b);
-                 else if (brownCarry === 'Homozygous') this.brown = new GenePair(GENE.BROWN.b, GENE.BROWN.b);
-                 else this.brown = new GenePair(GENE.BROWN.B, GENE.BROWN.B); // Default
-            }
-        }
-        
-        getDescription() {
-            const getColour = () => {
-                const diluteExpr = this.getDiluteExpr();
-                const brownExpr = this.getBrownExpr();
-
-                if ((this.gender.one === GENE.GENDER.O && this.gender.two === GENE.GENDER.O) || this.gender.one === GENE.GENDER.Y && this.gender.two === GENE.GENDER.O) {
-                     return diluteExpr === GENE_EXPR.Homo ? 'Cream' : 'Red';
-                }
-                if (diluteExpr === GENE_EXPR.Homo) {
-                    return brownExpr === GENE_EXPR.Homo ? 'Lilac' : 'Blue';
-                }
-                return brownExpr === GENE_EXPR.Homo ? 'Chocolate' : 'Seal';
-            };
-
-            const colour = getColour();
-            let desc = colour;
-            
-            if (this.gender.one === GENE.GENDER.X && this.gender.two === GENE.GENDER.O) {
-                desc += " Tortie";
-            }
-            
-            const diluteExpr = this.getDiluteExpr();
-            const brownExpr = this.getBrownExpr();
-            const carrying = [];
-
-            if (colour !== 'Blue' && colour !== 'Cream' && colour !== 'Lilac' && diluteExpr === GENE_EXPR.Hetero) {
-                carrying.push("dilute");
-            }
-            if (colour !== 'Chocolate' && colour !== 'Lilac' && brownExpr === GENE_EXPR.Hetero) {
-                carrying.push("chocolate");
-            }
-            
-            if(carrying.length > 0) {
-                desc += ` (carries ${carrying.join(' & ')})`;
-            }
-
-            if ((colour === 'Red' || colour === 'Cream') && brownExpr === GENE_EXPR.Homo) {
-                desc += " (homozygous for chocolate)";
-            }
-
-            return desc;
-        }
-
-        getDiluteExpr() {
-            if (this.dilute.one === GENE.DILUTE.D && this.dilute.two === GENE.DILUTE.D) return GENE_EXPR.None;
-            if (this.dilute.one === GENE.DILUTE.d && this.dilute.two === GENE.DILUTE.d) return GENE_EXPR.Homo;
-            return GENE_EXPR.Hetero;
-        }
-
-        getBrownExpr() {
-            if (this.brown.one === GENE.BROWN.B && this.brown.two === GENE.BROWN.B) return GENE_EXPR.None;
-            if (this.brown.one === GENE.BROWN.b && this.brown.two === GENE.BROWN.b) return GENE_EXPR.Homo;
-            return GENE_EXPR.Hetero;
-        }
-    }
-
-    function getCombinations(pair1, pair2) {
-        return [
-            new GenePair(pair1.one, pair2.one),
-            new GenePair(pair1.one, pair2.two),
-            new GenePair(pair1.two, pair2.one),
-            new GenePair(pair1.two, pair2.two)
-        ];
-    }
-    
-    function predictKittens(maleCat, femaleCat) {
-        const maleKittens = [];
-        const femaleKittens = [];
-
-        const genderCombos = getCombinations(maleCat.gender, femaleCat.gender);
-        const diluteCombos = getCombinations(maleCat.dilute, femaleCat.dilute);
-        const brownCombos = getCombinations(maleCat.brown, femaleCat.brown);
-        
-        for (const gender of genderCombos) {
-            for (const dilute of diluteCombos) {
-                for (const brown of brownCombos) {
-                    const kitten = new Cat();
-                    kitten.gender = gender;
-                    kitten.dilute = dilute;
-                    kitten.brown = brown;
-                    
-                    if (kitten.gender.one === GENE.GENDER.Y) {
-                         maleKittens.push(kitten.getDescription());
-                    } else {
-                         femaleKittens.push(kitten.getDescription());
-                    }
-                }
-            }
-        }
-
-        return {
-            males: [...new Set(maleKittens)].sort(),
-            females: [...new Set(femaleKittens)].sort()
-        };
-    }
-    
-    function populateSelect(element, options, defaultValue) {
-        element.innerHTML = '';
-        options.for
+                <td>Blue (carries choc), Lilac, Cream</td>
+                <td>Blue (carries choc), Lilac, Blue Tortie (carries choc), Lilac Tortie</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td><strong>Chocolate Tortie</strong></td>
+                <td>Chocolate (carries dilute), Lilac, Red (carries dilute), Cream</td>
+                <td>Chocolate (carries dilute), Lilac, Chocolate Tortie (carries dilute), Lilac Tortie</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td><strong>Lilac Tortie</strong></td>
+                <td>Lilac, Cream</td>
+                <td>Lilac, Lilac Tortie</td>
+            </tr>
+            <tr>
+                <td><strong>Red</strong></td>
+                <td><strong>Red</strong></td>
+                <td>Red, Cream</td>
+                <td>Red, Cream</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td><strong>Cream</strong></td>
+                <td>Red (carries dilute), Cream</td>
+                <td>Red (carries dilute), Cream</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td><strong>Seal Tortie</strong></td>
+                <td>Seal, Blue, Red, Cream</td>
+                <td>Red, Cream, Seal Tortie, Blue Tortie</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td><strong>Blue Tortie</strong></td>
+                <td>Seal (carries dilute), Blue, Red (carries dilute), Cream</td>
+                <td>Red (carries dilute), Cream, Seal Tortie (carries dilute), Blue Tortie</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td><strong>Chocolate Tortie</strong></td>
+                <td>Seal (carries choc), Chocolate, Red, Cream</td>
+                <td>Red, Cream, Seal Tortie (carries choc), Chocolate Tortie</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td><strong>Lilac Tortie</strong></td>
+                <td>Seal (carries choc, carries dilute), Chocolate (carries dilute), Red (carries dilute), Cream</td>
+                <td>Red (carries dilute), Cream, Seal Tortie (carries choc, carries dilute), Chocolate Tortie (carries
+                    dilute)</td>
+            </tr>
+            <tr>
+                <td><strong>Cream</strong></td>
+                <td><strong>Cream</strong></td>
+                <td>Cream</td>
+                <td>Cream</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td><strong>Seal Tortie</strong></td>
+                <td>Seal (carries dilute), Blue, Red (carries dilute), Cream</td>
+                <td>Red (carries dilute), Cream, Seal Tortie (carries dilute), Blue Tortie</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td><strong>Blue Tortie</strong></td>
+                <td>Blue, Cream</td>
+                <td>Cream, Blue Tortie</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td><strong>Chocolate Tortie</strong></td>
+                <td>Seal (carries choc, carries dilute), Chocolate (carries dilute), Red (carries dilute), Cream</td>
+                <td>Red (carries dilute), Cream, Seal Tortie (carries choc, carries dilute), Chocolate Tortie (carries
+                    dilute)</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td><strong>Lilac Tortie</strong></td>
+                <td>Blue (carries choc), Lilac, Cream</td>
+                <td>Cream, Blue Tortie (carries choc), Lilac Tortie</td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>
